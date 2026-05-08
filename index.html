@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1A5CFF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HGD V">
+<meta name="description" content="HGD Business Center — Espace Vendeur">
+<title>HGD V — App Vendeurs</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1A5CFF;
+    --primary-light: #4D7FFF;
+    --primary-dark: #0F3DB0;
+    --primary-bg: rgba(26,92,255,0.07);
+    --bg: #F4F6FB;
+    --bg2: #FFFFFF;
+    --bg3: #EEF1F8;
+    --border: #E2E8F0;
+    --text: #0F1523;
+    --text2: #64748B;
+    --text3: #94A3B8;
+    --green: #10B981;
+    --red: #EF4444;
+    --orange: #F59E0B;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(15,21,35,0.08);
+    --shadow-lg: 0 8px 40px rgba(15,21,35,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* LOGIN */
+  #loginScreen { position: fixed; inset: 0; background: linear-gradient(135deg, #0F1523 0%, #1A2742 50%, #0F3DB0 100%); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .login-wrap { text-align: center; padding: 16px; }
+  .login-logo-area { margin-bottom: 32px; }
+  .login-logo { font-size: 30px; font-weight: 700; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+  .login-badge { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-top: 6px; }
+  .login-card { background: #fff; border-radius: 16px; padding: 36px 32px; width: 380px; max-width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .login-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .login-card p { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+  .form-group { margin-bottom: 14px; text-align: left; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+  .form-input { width: 100%; border: 1.5px solid var(--border); border-radius: 9px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text); transition: border-color .2s; background: #fff; }
+  .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,92,255,0.12); }
+  .btn-primary-full { width: 100%; background: var(--primary); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 14px; padding: 13px; border: none; border-radius: 9px; cursor: pointer; transition: background .2s, transform .1s; }
+  .btn-primary-full:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .err-msg { color: var(--red); font-size: 12px; margin-top: 8px; text-align: center; }
+
+  /* ── LAYOUT DESKTOP ── */
+  #app { display: none; flex-direction: row; min-height: 100vh; }
+
+  aside {
+    width: 240px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 200;
+  }
+  .sidebar-vendor { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .vendor-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--primary-bg); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 16px; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+  .vendor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .vendor-info .name { font-size: 14px; font-weight: 700; }
+  .vendor-info .shop { font-size: 11px; color: var(--text2); }
+  .vendor-status { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+  .status-dot-sm { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .vendor-status span { font-size: 10px; color: var(--text3); }
+  nav { flex: 1; padding: 12px 0; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; font-size: 13px; color: var(--text2); cursor: pointer; transition: all .2s; border-left: 3px solid transparent; margin: 1px 0; }
+  .nav-item:hover { color: var(--text); background: var(--bg3); }
+  .nav-item.active { color: var(--primary); background: var(--primary-bg); border-left-color: var(--primary); font-weight: 600; }
+  .nav-item .icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-badge { background: var(--red); color: #fff; font-size: 10px; border-radius: 10px; padding: 1px 6px; margin-left: auto; }
+  .sidebar-footer { padding: 16px 18px; border-top: 1px solid var(--border); }
+
+  main { margin-left: 240px; padding: 0; flex: 1; }
+  .top-bar { position: sticky; top: 0; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; z-index: 100; box-shadow: var(--shadow); }
+  .page-title-sm { font-size: 16px; font-weight: 700; }
+  .top-actions { display: flex; gap: 10px; align-items: center; }
+  .content { padding: 24px 28px; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--primary); }
+  .stat-change { font-size: 11px; color: var(--green); margin-top: 3px; }
+
+  /* PRODUCTS */
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .product-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform .2s, box-shadow .2s; }
+  .product-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .product-img { height: 160px; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; overflow: hidden; }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+  .product-img-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; gap: 8px; }
+  .product-card:hover .product-img-overlay { display: flex; }
+  .product-body { padding: 14px; }
+  .product-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .product-price { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .product-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; border: none; cursor: pointer; transition: all .2s; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-xs { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+  .btn-p { background: var(--primary); color: #fff; }
+  .btn-p:hover { background: var(--primary-dark); }
+  .btn-ghost { background: var(--bg3); color: var(--text2); }
+  .btn-ghost:hover { background: var(--border); }
+  .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .btn-success { background: rgba(16,185,129,0.1); color: var(--green); }
+  .btn-outline { border: 1.5px solid var(--border); background: transparent; color: var(--text2); }
+  .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-bg); }
+
+  /* BADGES */
+  .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge-blue { background: var(--primary-bg); color: var(--primary); }
+  .badge-green { background: rgba(16,185,129,0.1); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,0.1); color: var(--red); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border-radius: 16px; width: 500px; max-width: 95vw; padding: 28px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* TEMOIGNAGES */
+  .temoignage-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .stars { color: #F59E0B; font-size: 14px; margin-bottom: 6px; }
+  .temo-author { font-size: 12px; color: var(--text2); margin-top: 8px; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 80px; right: 24px; background: var(--text); color: #fff; border-radius: 10px; padding: 12px 20px; font-size: 13px; z-index: 9999; display: none; box-shadow: var(--shadow-lg); }
+
+  /* PROFILE */
+  .profile-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; max-width: 500px; box-shadow: var(--shadow); }
+  .profile-avatar-big { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-bg); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: var(--primary); cursor: pointer; margin: 0 auto 12px; overflow: hidden; position: relative; }
+  .profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-edit { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; font-size: 18px; }
+  .profile-avatar-big:hover .avatar-edit { display: flex; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; box-shadow: var(--shadow); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 15px; font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; font-weight: 600; }
+  td { font-size: 13px; padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  tr:last-child td { border: none; }
+
+  select.form-input { cursor: pointer; }
+  textarea.form-input { resize: vertical; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg3); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ══════════════════════════════════════
+     MOBILE — Barre de navigation inférieure
+     ══════════════════════════════════════ */
+  #bottomNav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 20px rgba(15,21,35,0.10);
+    z-index: 300;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .bottom-nav-inner {
+    display: flex;
+    height: 64px;
+    align-items: stretch;
+  }
+  .bn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 10px;
+    font-weight: 600;
+    transition: color .2s;
+    border: none;
+    background: transparent;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bn-item svg { transition: transform .2s; }
+  .bn-item.active { color: var(--primary); }
+  .bn-item.active svg { transform: translateY(-2px); }
+  .bn-item.active .bn-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 2px;
+  }
+
+  /* Header mobile avec avatar */
+  #mobileHeader {
+    display: none;
+    position: sticky;
+    top: 0;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .mh-left { display: flex; align-items: center; gap: 10px; }
+  .mh-logo { font-size: 18px; font-weight: 700; color: var(--primary); font-family: 'Space Grotesk', sans-serif; }
+  .mh-shop { font-size: 12px; color: var(--text2); }
+  .mh-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-bg); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 14px; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+  .mh-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  @media (max-width: 768px) {
+    aside { display: none !important; }
+    main { margin-left: 0; padding-bottom: 64px; }
+    #bottomNav { display: block; }
+    #mobileHeader { display: flex; }
+
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .products-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .content { padding: 14px 14px; }
+    .top-bar { display: none; }
+
+    /* Dashboard grid mobile */
+    #sec-dashboard .dash-grid { grid-template-columns: 1fr !important; }
+
+    /* Boutique grid mobile */
+    #sec-boutique .two-col { grid-template-columns: 1fr !important; }
+    #sec-profil .two-col { grid-template-columns: 1fr !important; }
+
+    /* Modal */
+    .modal { padding: 20px 16px; }
+    #toast { bottom: 74px; right: 14px; left: 14px; }
+  }
+
+  @media (min-width: 769px) {
+    #mobileHeader { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-logo-area">
+      <svg width="48" height="48" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px;border-radius:14px;">
+  <defs><linearGradient id="lgv" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1A5CFF"/><stop offset="100%" style="stop-color:#0F3DB0"/></linearGradient></defs>
+  <rect width="512" height="512" rx="110" ry="110" fill="url(#lgv)"/>
+  <g transform="translate(256,256)">
+    <rect x="-135" y="-145" width="270" height="50" rx="8" fill="white" opacity="0.95"/>
+    <polygon points="-145,-95 145,-95 125,-55 -125,-55" fill="white" opacity="0.85"/>
+    <rect x="-125" y="-55" width="250" height="170" rx="6" fill="white" opacity="0.95"/>
+    <rect x="-28" y="45" width="56" height="70" rx="8" fill="#1A5CFF" opacity="0.8"/>
+    <rect x="-105" y="-30" width="60" height="55" rx="6" fill="#1A5CFF" opacity="0.25"/>
+    <rect x="45" y="-30" width="60" height="55" rx="6" fill="#1A5CFF" opacity="0.25"/>
+    <text x="0" y="-107" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="44" fill="#1A5CFF" letter-spacing="-1">HGD</text>
+  </g>
+</svg><div class="login-logo">HGD <span style="color:rgba(255,255,255,0.6)">V</span></div>
+      <div class="login-badge">Espace Vendeur</div>
+    </div>
+    <div class="login-card">
+      <h2>Connexion</h2>
+      <p>Connectez-vous avec vos identifiants fournis par l'administrateur.</p>
+      <div class="form-group"><label class="form-label">Adresse email</label><input class="form-input" type="email" id="vEmail" placeholder="votre@email.com" /></div>
+      <div class="form-group"><label class="form-label">Mot de passe</label><input class="form-input" type="password" id="vPass" placeholder="••••••••" /></div>
+      <button class="btn-primary-full" onclick="doLogin()">Se connecter</button>
+      <div class="err-msg" id="loginErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- ── SIDEBAR DESKTOP ── -->
+  <aside>
+    <div class="sidebar-vendor">
+      <div class="vendor-avatar" id="sideAvatar" onclick="showSection('profil')">A</div>
+      <div class="vendor-info">
+        <div class="name" id="vendorName">Vendeur</div>
+        <div class="shop" id="vendorShop">Ma boutique</div>
+        <div class="vendor-status"><div class="status-dot-sm"></div><span>En ligne</span></div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-item active" data-sec="dashboard" onclick="showSection('dashboard',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Tableau de bord</span></div>
+      <div class="nav-item" data-sec="produits" onclick="showSection('produits',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span><span>Mes produits</span></div>
+      <div class="nav-item" data-sec="temoignages" onclick="showSection('temoignages',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span>Témoignages</span></div>
+      <div class="nav-item" data-sec="horaires" onclick="showSection('horaires',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>Horaires</span></div>
+      <div class="nav-item" data-sec="boutique" onclick="showSection('boutique',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Ma boutique</span></div>
+      <div class="nav-item" data-sec="profil" onclick="showSection('profil',this)"><span class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Profil & Paramètres</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="doLogout()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- HEADER MOBILE -->
+    <div id="mobileHeader">
+      <div class="mh-left">
+        <div>
+          <div class="mh-logo">HGD V</div>
+          <div class="mh-shop" id="mhShopName">Ma boutique</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-p btn-sm" id="mhAddBtn" style="display:none;" onclick="openModal('addProductModal')">+ Produit</button>
+        <div class="mh-avatar" id="mhAvatar" onclick="showSection('profil')">A</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="section active" id="sec-dashboard">
+      <div class="top-bar">
+        <div class="page-title-sm">Tableau de bord</div>
+        <div class="top-actions"><button class="btn btn-p btn-sm" onclick="showSection('produits',null);openModal('addProductModal')">+ Ajouter un produit</button></div>
+      </div>
+      <div class="content">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Produits publiés</div><div class="stat-value" id="prodCount">0</div><div class="stat-change">↑ Actifs</div></div>
+          <div class="stat-card"><div class="stat-label">Messages reçus</div><div class="stat-value" style="color:var(--orange);">2</div><div class="stat-change" style="color:var(--orange);">Non lus</div></div>
+          <div class="stat-card" style="grid-column:span 1;"><div class="stat-label">Témoignages</div><div class="stat-value" style="color:var(--green);">3</div><div class="stat-change">Avis clients</div></div>
+        </div>
+        <div class="dash-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Mes produits récents</div><button class="btn btn-outline btn-sm" onclick="showSection('produits',null)">Voir tout</button></div>
+            <table><thead><tr><th>Produit</th><th>Prix</th><th>Statut</th></tr></thead><tbody id="dashProdList"></tbody></table>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Derniers avis</div></div>
+            <div style="font-size:13px;color:var(--text2);line-height:2;">
+              <div>⭐⭐⭐⭐⭐ <span style="color:var(--text);">Excellent produit !</span></div>
+              <div>⭐⭐⭐⭐ <span style="color:var(--text);">Très satisfaite</span></div>
+              <div>⭐⭐⭐⭐⭐ <span style="color:var(--text);">Livraison rapide</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUITS -->
+    <section class="section" id="sec-produits">
+      <div class="top-bar">
+        <div class="page-title-sm">Mes Produits</div>
+        <div class="top-actions"><button class="btn btn-p btn-sm" onclick="openModal('addProductModal')">+ Ajouter un produit</button></div>
+      </div>
+      <div class="content"><div class="products-grid" id="productsGrid"></div></div>
+    </section>
+
+    <!-- TEMOIGNAGES -->
+    <section class="section" id="sec-temoignages">
+      <div class="top-bar"><div class="page-title-sm">Témoignages clients</div></div>
+      <div class="content">
+        <div id="temoignagesContainer">
+          <div class="temoignage-card"><div class="stars">⭐⭐⭐⭐⭐</div><div style="font-size:14px;line-height:1.6;">"Très belle boutique ! Les articles sont de grande qualité et la vendeuse est très sympathique. Je recommande vivement !"</div><div class="temo-author">— Afi Mensah · 28/04/2026</div></div>
+          <div class="temoignage-card"><div class="stars">⭐⭐⭐⭐</div><div style="font-size:14px;line-height:1.6;">"Bonne expérience d'achat. L'article correspondait bien à la description. Je reviendrai !"</div><div class="temo-author">— Nana Adjoua · 25/04/2026</div></div>
+          <div class="temoignage-card"><div class="stars">⭐⭐⭐⭐⭐</div><div style="font-size:14px;line-height:1.6;">"Magnifique robe reçue. La qualité est au rendez-vous. Paiement en face à face, très sécurisé !"</div><div class="temo-author">— Koffi Yao · 20/04/2026</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HORAIRES -->
+    <section class="section" id="sec-horaires">
+      <div class="top-bar"><div class="page-title-sm">Horaires d'ouverture</div></div>
+      <div class="content">
+        <div class="card" style="max-width:600px;">
+          <div class="card-header"><div class="card-title">Définir mes horaires</div><button class="btn btn-p btn-sm" onclick="saveHoraires()">Enregistrer</button></div>
+          <div id="horairesForm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOUTIQUE -->
+    <section class="section" id="sec-boutique">
+      <div class="top-bar"><div class="page-title-sm">Ma Boutique</div></div>
+      <div class="content">
+        <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📍 Adresse & localisation</div></div>
+            <div class="form-group"><label class="form-label">Adresse complète</label><input class="form-input" id="shopAddress" placeholder="Ex: Quartier Akpakpa, Cotonou" /></div>
+            <div class="form-group"><label class="form-label">Description courte</label><textarea class="form-input" id="shopDesc" rows="3" placeholder="Décrivez votre boutique..."></textarea></div>
+            <div class="form-group"><label class="form-label">Catégorie</label><select class="form-input"><option>Mode & Vêtements</option><option>Électronique</option><option>Alimentation</option><option>Beauté & Cosmétiques</option></select></div>
+            <button class="btn btn-p" onclick="saveShopInfo()">Enregistrer</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📞 Mes contacts</div></div>
+            <div class="form-group"><label class="form-label">Numéro d'appel</label><input class="form-input" id="shopPhone" placeholder="Ex: 0155861916" /></div>
+            <div class="form-group"><label class="form-label">Numéro WhatsApp</label><input class="form-input" id="shopWA" placeholder="Ex: 0143718596" /></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="shopEmail" placeholder="boutique@email.com" /></div>
+            <button class="btn btn-p" onclick="saveShopInfo()">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFIL -->
+    <section class="section" id="sec-profil">
+      <div class="top-bar"><div class="page-title-sm">Profil & Paramètres</div></div>
+      <div class="content">
+        <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:800px;">
+          <div class="card" style="text-align:center;">
+            <div class="profile-avatar-big" id="bigAvatar" onclick="document.getElementById('photoInput').click()">
+              <span id="bigAvatarText">A</span>
+              <div class="avatar-edit">📷</div>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="changePhoto(this)" />
+            <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">Cliquez pour changer la photo</div>
+            <div style="font-size:16px;font-weight:700;" id="profileName">Vendeur</div>
+            <div style="font-size:13px;color:var(--text2);" id="profileShop">Ma boutique</div>
+            <div style="margin-top:12px;"><span class="badge badge-green">Boutique active</span></div>
+            <div style="margin-top:16px;">
+              <button class="btn btn-ghost btn-sm" onclick="doLogout()">🚪 Déconnexion</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:16px;">🔒 Changer le mot de passe</div>
+            <div class="form-group"><label class="form-label">Mot de passe actuel</label><input class="form-input" type="password" placeholder="••••••••" /></div>
+            <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input class="form-input" type="password" id="newPass" placeholder="••••••••" /></div>
+            <div class="form-group"><label class="form-label">Confirmer</label><input class="form-input" type="password" id="confirmPass" placeholder="••••••••" /></div>
+            <button class="btn btn-p" onclick="changePassword()">Changer le mot de passe</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── BOTTOM NAV MOBILE ── -->
+  <div id="bottomNav">
+    <div class="bottom-nav-inner">
+
+      <button class="bn-item active" data-sec="dashboard" onclick="showSection('dashboard')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Accueil</span>
+        <div class="bn-dot"></div>
+      </button>
+
+      <button class="bn-item" data-sec="produits" onclick="showSection('produits')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Produits</span>
+        <div class="bn-dot"></div>
+      </button>
+
+      <!-- Bouton central ADD -->
+      <button class="bn-item" onclick="openModal('addProductModal')" style="flex:0 0 64px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,92,255,0.4);margin-top:-16px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <span style="margin-top:4px;color:var(--primary);font-weight:700;">Ajouter</span>
+      </button>
+
+      <button class="bn-item" data-sec="boutique" onclick="showSection('boutique')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Boutique</span>
+        <div class="bn-dot"></div>
+      </button>
+
+      <button class="bn-item" data-sec="profil" onclick="showSection('profil')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Profil</span>
+        <div class="bn-dot"></div>
+      </button>
+
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<!-- MODAL PRODUIT -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <h3>🛍️ <span id="modalProductTitle">Ajouter un produit</span></h3>
+    <div class="form-group"><label class="form-label">Nom du produit *</label><input class="form-input" id="pName" placeholder="Ex: Robe africaine" /></div>
+    <div class="form-group"><label class="form-label">Prix (FCFA) *</label><input class="form-input" type="number" id="pPrice" placeholder="Ex: 15000" /></div>
+    <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="pDesc" rows="3" placeholder="Décrivez votre produit..."></textarea></div>
+    <div class="form-group"><label class="form-label">Photo du produit</label><input class="form-input" type="file" id="pPhoto" accept="image/*" /></div>
+    <div class="form-group"><label class="form-label">Catégorie</label>
+      <select class="form-input" id="pCat"><option>Mode & Vêtements</option><option>Chaussures</option><option>Accessoires</option><option>Électronique</option><option>Alimentation</option><option>Cosmétiques</option><option>Autre</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addProductModal')">Annuler</button>
+      <button class="btn btn-p" onclick="saveProduct()">Publier le produit</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc,
+  serverTimestamp, getDocs, enableIndexedDbPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAHvACOz8fmH22iYXYrX8BaEOahdr85J-Y",
+  authDomain: "hgd-business-1e947.firebaseapp.com",
+  projectId: "hgd-business-1e947",
+  storageBucket: "hgd-business-1e947.firebasestorage.app",
+  messagingSenderId: "214842602894",
+  appId: "1:214842602894:web:cb847c846cfac4d203e0df",
+  measurementId: "G-TQMY3VTGDW"
+};
+
+const app = initializeApp(firebaseConfig);
+let analytics = null;
+(async () => { try { const m = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js"); analytics = m.getAnalytics(app); } catch(e) {} })();
+const db = getFirestore(app);
+enableIndexedDbPersistence(db).catch(() => {});
+
+let currentVendor = null;
+let editingProductId = null;
+let allShops = [];
+let myFirebaseProducts = [];
+let unsubProducts = null;
+
+const emojis = { 'Mode & Vêtements':'👗','Chaussures':'👠','Accessoires':'👜','Électronique':'📱','Alimentation':'🥗','Cosmétiques':'💄','Autre':'📦' };
+
+onSnapshot(collection(db,'shops'), snap => {
+  allShops = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (currentVendor) {
+    const myShop = allShops.find(s => s.id === currentVendor.shopId);
+    if (myShop && myShop.status === 'suspended') {
+      showToast('⚠️ Votre boutique a été suspendue par l\'administrateur.');
+    }
+  }
+});
+
+window.doLogin = async function() {
+  const e = document.getElementById('vEmail').value.trim();
+  const p = document.getElementById('vPass').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.querySelector('.btn-primary-full');
+  if (!e || !p) { errEl.textContent = 'Veuillez remplir tous les champs.'; return; }
+  errEl.textContent = '';
+  btn.textContent = 'Connexion...';
+  btn.disabled = true;
+  try {
+    const snap = await getDocs(collection(db, 'shops'));
+    allShops = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const shop = allShops.find(s => s.email === e && s.pass === p);
+    if (!shop) { errEl.textContent = 'Email ou mot de passe incorrect.'; btn.textContent = 'Se connecter'; btn.disabled = false; return; }
+    if (shop.status === 'suspended') { errEl.textContent = 'Votre boutique est suspendue. Contactez l\'administrateur.'; btn.textContent = 'Se connecter'; btn.disabled = false; return; }
+    currentVendor = { shopId: shop.id, name: shop.vendor, shopName: shop.name, email: shop.email };
+    const initials = shop.vendor.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('vendorName').textContent = shop.vendor;
+    document.getElementById('vendorShop').textContent = shop.name;
+    document.getElementById('sideAvatar').textContent = initials;
+    document.getElementById('profileName').textContent = shop.vendor;
+    document.getElementById('profileShop').textContent = shop.name;
+    document.getElementById('bigAvatarText').textContent = initials[0];
+    document.getElementById('mhShopName').textContent = shop.name;
+    document.getElementById('mhAvatar').textContent = initials[0];
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadMyProducts();
+    updateDashboard();
+    renderHoraires();
+  } catch(err) {
+    errEl.textContent = 'Erreur de connexion. Vérifiez votre internet et réessayez.';
+    btn.textContent = 'Se connecter';
+    btn.disabled = false;
+  }
+};
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') window.doLogin();
+});
+
+window.doLogout = function() {
+  if (unsubProducts) unsubProducts();
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  currentVendor = null;
+  myFirebaseProducts = [];
+};
+
+// Navigation unifiée desktop + mobile
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+
+  // Desktop sidebar
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const desktopItem = document.querySelector(`.nav-item[data-sec="${id}"]`);
+  if (desktopItem) desktopItem.classList.add('active');
+  else if (el && el.classList && el.classList.contains('nav-item')) el.classList.add('active');
+
+  // Bottom nav mobile
+  document.querySelectorAll('.bn-item[data-sec]').forEach(n => {
+    n.classList.remove('active');
+    n.querySelector('.bn-dot').style.display = 'none';
+  });
+  const bnItem = document.querySelector(`.bn-item[data-sec="${id}"]`);
+  if (bnItem) {
+    bnItem.classList.add('active');
+    bnItem.querySelector('.bn-dot').style.display = 'block';
+  }
+
+  // Bouton + dans le header mobile
+  const mhBtn = document.getElementById('mhAddBtn');
+  if (mhBtn) mhBtn.style.display = id === 'produits' ? 'inline-flex' : 'none';
+}
+window.showSection = showSection;
+
+// Init dots
+document.querySelectorAll('.bn-item[data-sec]').forEach(n => {
+  const dot = n.querySelector('.bn-dot');
+  if (dot) dot.style.display = 'none';
+});
+// Active dot for default section
+const defaultDot = document.querySelector('.bn-item[data-sec="dashboard"] .bn-dot');
+if (defaultDot) defaultDot.style.display = 'block';
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+function loadMyProducts() {
+  if (!currentVendor) return;
+  if (unsubProducts) unsubProducts();
+  unsubProducts = onSnapshot(collection(db,'products'), snap => {
+    myFirebaseProducts = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.shopId === currentVendor.shopId);
+    renderProducts();
+    updateDashboard();
+  });
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid || !currentVendor) return;
+  grid.innerHTML = myFirebaseProducts.map(p => `
+    <div class="product-card" id="pc-${p.id}">
+      <div class="product-img">
+        ${p.img ? `<img src="${p.img}" />` : (p.emoji||'📦')}
+        <div class="product-img-overlay">
+          <button class="btn btn-p btn-xs" onclick="editProduct('${p.id}')">✏️ Modifier</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteProduct('${p.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div style="font-size:11px;color:var(--text2);margin:3px 0 6px;">${p.cat||''}</div>
+        <div class="product-price">${p.price.toLocaleString('fr-FR')} FCFA</div>
+        <div class="product-actions">
+          <button class="btn btn-ghost btn-xs" style="flex:1;" onclick="editProduct('${p.id}')">Modifier</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteProduct('${p.id}')">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  `).join('') || '<div style="padding:40px;text-align:center;color:var(--text2);">Aucun produit. Ajoutez votre premier produit !</div>';
+}
+
+function updateDashboard() {
+  document.getElementById('prodCount').textContent = myFirebaseProducts.length;
+  const dashBody = document.getElementById('dashProdList');
+  if (dashBody) {
+    dashBody.innerHTML = myFirebaseProducts.slice(0,5).map(p =>
+      `<tr><td>${p.emoji||'📦'} ${p.name}</td><td>${p.price.toLocaleString('fr-FR')} FCFA</td><td><span class="badge badge-blue">Publié</span></td></tr>`
+    ).join('') || '<tr><td colspan="3" style="color:var(--text2);font-size:12px;">Aucun produit</td></tr>';
+  }
+}
+
+async function saveProduct() {
+  const name  = document.getElementById('pName').value.trim();
+  const price = parseInt(document.getElementById('pPrice').value);
+  const desc  = document.getElementById('pDesc').value.trim();
+  const cat   = document.getElementById('pCat').value;
+  const file  = document.getElementById('pPhoto').files[0];
+  if (!name || !price) { showToast('⚠️ Nom et prix requis.'); return; }
+
+  const proceed = async (imgUrl) => {
+    if (editingProductId) {
+      const updates = { name, price, desc, cat, emoji: emojis[cat]||'📦' };
+      if (imgUrl) updates.img = imgUrl;
+      await updateDoc(doc(db,'products',editingProductId), updates);
+      editingProductId = null;
+    } else {
+      await addDoc(collection(db,'products'), { shopId: currentVendor.shopId, name, price, desc, cat, emoji: emojis[cat]||'📦', img: imgUrl||null, badge: null, createdAt: serverTimestamp() });
+    }
+    closeModal('addProductModal');
+    ['pName','pPrice','pDesc'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('pPhoto').value = '';
+    document.getElementById('modalProductTitle').textContent = 'Ajouter un produit';
+    showToast('✅ Produit enregistré !');
+  };
+
+  if (file) { const r = new FileReader(); r.onload = e => proceed(e.target.result); r.readAsDataURL(file); }
+  else { proceed(null); }
+}
+window.saveProduct = saveProduct;
+
+window.editProduct = function(id) {
+  const p = myFirebaseProducts.find(p => p.id === id);
+  if (!p) return;
+  editingProductId = id;
+  document.getElementById('modalProductTitle').textContent = 'Modifier le produit';
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pDesc').value = p.desc||'';
+  document.getElementById('pCat').value = p.cat||'Autre';
+  openModal('addProductModal');
+};
+
+window.deleteProduct = async function(id) {
+  if (!confirm('Supprimer ce produit ?')) return;
+  await deleteDoc(doc(db,'products',id));
+  showToast('🗑️ Produit supprimé.');
+};
+
+const days = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+let horaires = days.map((d,i) => ({ day: d, open: i < 6, from: '08:00', to: '18:00' }));
+
+function renderHoraires() {
+  document.getElementById('horairesForm').innerHTML = horaires.map((h,i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <div style="width:90px;font-size:13px;font-weight:600;">${h.day}</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+        <input type="checkbox" ${h.open?'checked':''} onchange="toggleDay(${i},this.checked)" />
+        <span>${h.open?'Ouvert':'Fermé'}</span>
+      </label>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto;${!h.open?'opacity:.4;pointer-events:none;':''}">
+        <input type="time" value="${h.from}" class="form-input" style="width:110px;padding:6px 10px;" onchange="horaires[${i}].from=this.value" />
+        <span style="font-size:12px;color:var(--text2);">à</span>
+        <input type="time" value="${h.to}" class="form-input" style="width:110px;padding:6px 10px;" onchange="horaires[${i}].to=this.value" />
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggleDay = function(i, val) { horaires[i].open = val; renderHoraires(); };
+window.saveHoraires = async function() {
+  if (!currentVendor) return;
+  try {
+    await updateDoc(doc(db,'shops', currentVendor.shopId), { horaires });
+    showToast('✅ Horaires enregistrés !');
+  } catch(e) { showToast('Erreur : ' + e.message); }
+};
+
+window.saveShopInfo = async function() {
+  if (!currentVendor) return;
+  const address      = document.getElementById('shopAddress')?.value.trim() || '';
+  const desc         = document.getElementById('shopDesc')?.value.trim()    || '';
+  const phone        = document.getElementById('shopPhone')?.value.trim()   || '';
+  const whatsapp     = document.getElementById('shopWA')?.value.trim()      || '';
+  const contactEmail = document.getElementById('shopEmail')?.value.trim()   || '';
+  try {
+    await updateDoc(doc(db,'shops', currentVendor.shopId), { address, desc, phone, whatsapp, contactEmail });
+    showToast('✅ Informations boutique mises à jour !');
+  } catch(e) { showToast('Erreur : ' + e.message); }
+};
+
+window.changePhoto = function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const av = document.getElementById('bigAvatar');
+    av.innerHTML = `<img src="${e.target.result}" /><div class="avatar-edit">📷</div>`;
+    document.getElementById('sideAvatar').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    document.getElementById('mhAvatar').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" />`;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.changePassword = async function() {
+  const np = document.getElementById('newPass').value;
+  const cp = document.getElementById('confirmPass').value;
+  if (!np || np !== cp) { showToast('⚠️ Les mots de passe ne correspondent pas.'); return; }
+  if (!currentVendor) return;
+  try {
+    await updateDoc(doc(db,'shops', currentVendor.shopId), { pass: np });
+    showToast('✅ Mot de passe modifié !');
+    document.getElementById('newPass').value = '';
+    document.getElementById('confirmPass').value = '';
+  } catch(e) { showToast('Erreur : ' + e.message); }
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+window.showToast = showToast;
+</script>
+
+<script>
+(function(){
+  const manifestData = `{"name": "HGD V \u2014 App Vendeurs", "short_name": "HGD V", "description": "HGD Business Center \u2014 Espace Vendeur", "start_url": "./", "display": "standalone", "orientation": "portrait", "background_color": "#F4F6FB", "theme_color": "#1A5CFF", "lang": "fr", "icons": [{"src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%231A5CFF%3Bstop-opacity%3A1%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%230F3DB0%3Bstop-opacity%3A1%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20ry%3D%22110%22%20fill%3D%22url%28%23bgGrad%29%22/%3E%0A%20%20%3Cg%20transform%3D%22translate%28256%2C256%29%22%3E%0A%20%20%20%20%3Crect%20x%3D%22-130%22%20y%3D%22-140%22%20width%3D%22260%22%20height%3D%2246%22%20rx%3D%228%22%20fill%3D%22white%22%20opacity%3D%220.95%22/%3E%0A%20%20%20%20%3Cpolygon%20points%3D%22-140%2C-94%20140%2C-94%20120%2C-54%20-120%2C-54%22%20fill%3D%22white%22%20opacity%3D%220.85%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-120%22%20y%3D%22-54%22%20width%3D%22240%22%20height%3D%22164%22%20rx%3D%226%22%20fill%3D%22white%22%20opacity%3D%220.95%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-26%22%20y%3D%2248%22%20width%3D%2252%22%20height%3D%2266%22%20rx%3D%228%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.8%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-100%22%20y%3D%22-28%22%20width%3D%2256%22%20height%3D%2252%22%20rx%3D%226%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.25%22/%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22-28%22%20width%3D%2256%22%20height%3D%2252%22%20rx%3D%226%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.25%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%22-103%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2240%22%20fill%3D%22%231A5CFF%22%3EHGD%3C/text%3E%0A%20%20%20%20%3Crect%20x%3D%22-26%22%20y%3D%22-50%22%20width%3D%2252%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.9%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%22-35%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2213%22%20fill%3D%22white%22%20letter-spacing%3D%223%22%3EV%3C/text%3E%0A%20%20%3C/g%3E%0A%3C/svg%3E", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}], "prefer_related_applications": false}`;
+  const mBlob = new Blob([manifestData], {type:'application/manifest+json'});
+  const mUrl  = URL.createObjectURL(mBlob);
+  const mLink = document.createElement('link');
+  mLink.rel = 'manifest'; mLink.href = mUrl;
+  document.head.appendChild(mLink);
+
+  const iconUri = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22bgGrad%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20style%3D%22stop-color%3A%231A5CFF%3Bstop-opacity%3A1%22%20/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20style%3D%22stop-color%3A%230F3DB0%3Bstop-opacity%3A1%22%20/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22110%22%20ry%3D%22110%22%20fill%3D%22url%28%23bgGrad%29%22/%3E%0A%20%20%3Cg%20transform%3D%22translate%28256%2C256%29%22%3E%0A%20%20%20%20%3Crect%20x%3D%22-130%22%20y%3D%22-140%22%20width%3D%22260%22%20height%3D%2246%22%20rx%3D%228%22%20fill%3D%22white%22%20opacity%3D%220.95%22/%3E%0A%20%20%20%20%3Cpolygon%20points%3D%22-140%2C-94%20140%2C-94%20120%2C-54%20-120%2C-54%22%20fill%3D%22white%22%20opacity%3D%220.85%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-120%22%20y%3D%22-54%22%20width%3D%22240%22%20height%3D%22164%22%20rx%3D%226%22%20fill%3D%22white%22%20opacity%3D%220.95%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-26%22%20y%3D%2248%22%20width%3D%2252%22%20height%3D%2266%22%20rx%3D%228%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.8%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22-100%22%20y%3D%22-28%22%20width%3D%2256%22%20height%3D%2252%22%20rx%3D%226%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.25%22/%3E%0A%20%20%20%20%3Crect%20x%3D%2244%22%20y%3D%22-28%22%20width%3D%2256%22%20height%3D%2252%22%20rx%3D%226%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.25%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%22-103%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2240%22%20fill%3D%22%231A5CFF%22%3EHGD%3C/text%3E%0A%20%20%20%20%3Crect%20x%3D%22-26%22%20y%3D%22-50%22%20width%3D%2252%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22%231A5CFF%22%20opacity%3D%220.9%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%22-35%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%20Black%2Csans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2213%22%20fill%3D%22white%22%20letter-spacing%3D%223%22%3EV%3C/text%3E%0A%20%20%3C/g%3E%0A%3C/svg%3E`;
+  const iLink = document.createElement('link');
+  iLink.rel = 'apple-touch-icon'; iLink.href = iconUri;
+  document.head.appendChild(iLink);
+  const iLink2 = document.createElement('link');
+  iLink2.rel = 'icon'; iLink2.type = 'image/svg+xml'; iLink2.href = iconUri;
+  document.head.appendChild(iLink2);
+
+  const swCode = `
+const CACHE='hgd-v-v2';
+self.addEventListener('install',e=>{self.skipWaiting();});
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  if(e.request.url.includes('firebasejs')||e.request.url.includes('googleapis')||e.request.url.includes('gstatic')){
+    e.respondWith(fetch(e.request).catch(()=>new Response('',{status:503})));
+  }
+});
+`;
+  const swBlob = new Blob([swCode], {type:'text/javascript'});
+  const swUrl  = URL.createObjectURL(swBlob);
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register(swUrl, {scope:'./'}).catch(()=>{});
+  }
+
+  let deferredPrompt;
+  const btn = document.createElement('button');
+  btn.id = 'pwaInstall';
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Installer l\'app';
+  btn.style.cssText='display:none;position:fixed;bottom:80px;right:20px;z-index:9999;background:#1A5CFF;color:#fff;border:none;border-radius:30px;padding:12px 20px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.25);align-items:center;gap:4px;';
+  document.body.appendChild(btn);
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;btn.style.display='flex';});
+  btn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt=null;btn.style.display='none';});
+  window.addEventListener('appinstalled',()=>{btn.style.display='none';});
+})();
+</script>
+</body>
+</html>
